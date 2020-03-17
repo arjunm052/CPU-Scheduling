@@ -1,0 +1,78 @@
+import java.util.*;
+
+public class RoundRobin {
+
+	public static void main(String[] args) {
+		int m,init,fin,i,n,x,slice,total=0;
+		double wt=0,tat=0;
+		int[] bt = new int[10];
+		int[] at = new int[10];
+		int[] temp = new int[10];
+		boolean[] flag = new boolean[10];
+		
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter no. of processes: ");
+		n=scan.nextInt();
+		x=n;
+		
+		for(i=1;i<=n;i++) {
+			System.out.println("Enter process "+(i)+" Arrival Time: ");
+			at[i]=scan.nextInt();
+			System.out.println("Enter process "+(i)+" Burst Time: ");
+			bt[i]=scan.nextInt();
+			temp[i]=bt[i];
+			flag[i]=false;
+		}
+		
+		System.out.println("Enter Time Quantam: ");
+		slice=scan.nextInt();
+		scan.close();
+		
+		Queue<Integer> q = new LinkedList<>();
+		for(i=1;i<=n;i++) {
+			if(at[i]<=total && flag[i]==false)
+				q.add(i);
+		}
+		
+		System.out.println("PID\t BST\t TAT\t  WT\t  CT");
+		
+		for(total=0;x!=0;) {
+			int cur = q.remove();
+			
+			if(temp[cur]<=slice && temp[cur]>0 && flag[cur]==false) {
+				init=total;
+				total=total+temp[cur];
+				fin=total;
+				temp[cur]=0;
+				flag[cur]=true;
+				for(m=1;m<=n;m++) {
+					if(at[m]>init && at[m]<=fin && flag[i]==false)
+						q.add(m);
+				}
+			}
+			
+			else if(temp[cur]>0 && flag[cur]==false) {
+				init=total;
+				temp[cur]=temp[cur]-slice;
+				total=total+slice;
+				fin=total;
+				for(m=1;m<=n;m++) {
+					if(at[m]>init && at[m]<=fin && flag[i]==false)
+						q.add(m);
+				}
+				q.add(cur);
+			}
+			
+			if(temp[cur]==0 && flag[cur]==true) {
+				x--;
+				wt+=total-at[cur]-bt[cur];
+				tat+=total-at[cur];
+				System.out.println("P"+cur+"\t  "+bt[cur]+"\t  "+(total-at[cur])+"\t  "+(total-at[cur]-bt[cur])+"\t  "+(total));
+			}
+		}
+		
+		System.out.println("Average Waiting Time: "+(wt/n));
+		System.out.println("Average Turnaround Time: "+(tat/n));
+	}
+
+}
